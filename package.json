@@ -1,0 +1,27 @@
+{
+  "name": "company-core",
+  "version": "1.0.0",
+  "main": "dist/company-core.cjs.js",
+  "module": "dist/company-core.esm.js",
+  "description": "Core library for Company.com microservices with support for the SNS event stream.",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.522.0",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "rollup": "^1.20.3",
+    "rollup-plugin-babel": "^4.3.3"
+  },
+  "files": [
+    "dist"
+  ]
+}
