@@ -1,3 +1,5 @@
+import { SSM } from 'aws-sdk';
+
 /**
  * @description Attempt to JSON.parse input value. If parse fails, return original value.
  * @param {any} v
@@ -33,7 +35,7 @@ const getCodeStatus = code => {
  */
 
 /**
- *   Format HTTP lambda's input, result, and response code to be comliant with Lambda proxy integration
+ * @description Format HTTP lambda's input, result, and response code to be comliant with Lambda proxy integration
  * @param {number} code
  * @param {*} input
  * @param {*} result
@@ -51,3 +53,29 @@ export const formatHttpResponse = (code, input, result) => {
     })
   };
 };
+
+const processParams = ({ Parameters: params }) => params.reduce((result, param) => {
+  const { Name: name, Value: value } = param;
+  return { ...result, [name]: value };
+}, {});
+
+/**
+ * @description Get AWS Parameter Store parameters in an object, formatted such that keys correspond to parameter names and values to parameter values
+ * @param {string} region 
+ * @param {string[]} paramNames
+ * @template T
+ * @returns {{}}
+ */
+const getEnvParams = async (region, paramNames) => {
+  const ssm = new SSM({ apiVersion: '2014-11-06', region });
+
+  const options = {
+    Names: paramNames,
+    WithDecryption: true,
+  };
+
+  const params = await ssm.getParameters(options).promise();
+  return processParams(params);
+};
+
+module.exports = getEnvParams;
