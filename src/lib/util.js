@@ -66,7 +66,7 @@ const processParams = ({ Parameters: params }) => params.reduce((result, param) 
  * @template T
  * @returns {{}}
  */
-const getEnvParams = async (region, paramNames) => {
+export const getEnvParams = async (region, paramNames) => {
   const ssm = new SSM({ apiVersion: '2014-11-06', region });
 
   const options = {
