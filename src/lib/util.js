@@ -77,5 +77,3 @@ export const getEnvParams = async (region, paramNames) => {
   const params = await ssm.getParameters(options).promise();
   return processParams(params);
 };
-
-module.exports = getEnvParams;
