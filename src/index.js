@@ -1,4 +1,5 @@
 import { withEventStream } from './lib/helper';
+import es from './lib/eventStream'
 import * as utils from './lib/util';
 
 /**
@@ -11,7 +12,7 @@ module.exports = {
   /**
    * @description Event stream libs
    */
-  eventStream: { withEventStream },
+  eventStream: { ...es, withEventStream },
   /**
    * @description Utility functions
    */
