@@ -2,8 +2,6 @@ import uuid from 'uuid/v4';
 import es from './eventStream';
 
 export const withEventStream = async (snsTopicARN, eventHandler, event) => {
-  console.log('event: ', JSON.stringify(event));
-
   let attributes;
   let message;
 
@@ -34,9 +32,9 @@ export const withEventStream = async (snsTopicARN, eventHandler, event) => {
       },
     );
   } catch (err) {
-    console.error('ERROR: ', err);
+    console.error(err);
 
-    return es.publish(
+    await es.publish(
       snsTopicARN,
       {
         context: message.context,
@@ -56,5 +54,7 @@ export const withEventStream = async (snsTopicARN, eventHandler, event) => {
         status: 'fail',
       },
     );
+
+    throw err;
   }
 };

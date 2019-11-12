@@ -1,6 +1,6 @@
 {
   "name": "company-core",
-  "version": "1.1.2",
+  "version": "1.2.2",
   "main": "dist/company-core.cjs.js",
   "module": "dist/company-core.esm.js",
   "description": "Core library for Company.com microservices with support for the SNS event stream.",
