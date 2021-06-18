@@ -35,7 +35,7 @@ const getCodeStatus = code => {
  */
 
 /**
- * @description Format HTTP lambda's input, result, and response code to be comliant with Lambda proxy integration
+ * @description Format HTTP lambda's input, result, and response code to be compliant with Lambda proxy integration
  * @param {number} code
  * @param {*} input
  * @param {*} result
@@ -77,3 +77,21 @@ export const getEnvParams = async (region, paramNames) => {
   const params = await ssm.getParameters(options).promise();
   return processParams(params);
 };
+
+/**
+ * Classis sleep function using async-await
+ * @param {Number} s is the number of milliseconds to sleep
+ */
+ export const sleep = async s => new Promise(r => setTimeout(() => { r(); }, s));
+
+ /**
+  * Checks if the given param exists in the given object
+  * @param {object} obj is the object to check if the given param exists in
+  * @param {string} param is the param to check if it exists in the given obj
+  * @returns {Boolean}
+  */
+ // eslint-disable-next-line max-len
+ export const itemExists = (obj, param) => typeof obj === 'object' && obj !== null ? Object.prototype.hasOwnProperty.call(
+   obj, param,
+ ) : false;
+ 
