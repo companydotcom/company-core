@@ -77,3 +77,49 @@ export const getEnvParams = async (region, paramNames) => {
   const params = await ssm.getParameters(options).promise();
   return processParams(params);
 };
+
+/**
+ * Classis sleep function using async-await
+ * @param {Number} s is the number of milliseconds to sleep
+ */
+ export const sleep = async s => new Promise(r => setTimeout(() => { r(); }, s));
+
+ /**
+  * Checks if the given param exists in the given object
+  * @param {object} obj is the object to check if the given param exists in
+  * @param {string} param is the param to check if it exists in the given obj
+  * @returns {Boolean}
+  */
+ // eslint-disable-next-line max-len
+ export const itemExists = (obj, param) => typeof obj === 'object' && obj !== null ? Object.prototype.hasOwnProperty.call(
+   obj, param,
+ ) : false;
+
+export const setUserVendorIdMap = async (userId, vendorName, vendorId) => {
+  if (!userId || !vendorName || !vendorId) {
+    console.log('UserId, Vendor/ServiceName and the user\'s id with the vendor all all required');
+    throw new Error('Cannot create vendor Id map without all required data')
+  }
+  await batchPutIntoDynamoDb([{
+    userIdService: `${userId}-${vendorName}`,
+    vendorIdService: `${vendorId}-${vendorName}`
+  }], 'VendorIdUserMap');
+};
+
+export const getUserIdByVendorId = async (vendorName, vendorId) => {
+  if (!vendorId || !vendorName) {
+    console.log('Vendor/service name and userId are both required');
+    throw new Error('Cannot fetch userId without vendorId and service name');
+  }
+  const records = await fetchRecordsByQuery({
+    TableName: 'VendorIdUserMap',
+    IndexName: 'vendorIdService-index',
+    KeyConditionExpression: 'vendorIdService = :vid',
+    ExpressionAttributeValues: {
+    ":vid": {
+        S: `${vendorId}-${vendorName}`
+      },
+    }
+  });
+  return records ? records[0] : undefined;
+};
