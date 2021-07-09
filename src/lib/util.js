@@ -36,7 +36,7 @@ const getCodeStatus = code => {
  */
 
 /**
- * @description Format HTTP lambda's input, result, and response code to be comliant with Lambda proxy integration
+ * @description Format HTTP lambda's input, result, and response code to be compliant with Lambda proxy integration
  * @param {number} code
  * @param {*} input
  * @param {*} result
