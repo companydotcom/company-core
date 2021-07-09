@@ -1,5 +1,4 @@
 import { DynamoDB } from 'aws-sdk';
-import { sleep, itemExists } from './util';
 
 const dynamodb = new DynamoDB({ apiVersion: '2012-08-10' })
 const docClient = new DynamoDB.DocumentClient()
@@ -9,6 +8,23 @@ const batchWriteRecordsLimit = 25;
 
 // Fallback safety limit for bulk queries from DynamoDb
 const dynamoDbQuerySafeBatchLimit = 1000;
+
+/**
+ * Classis sleep function using async-await
+ * @param {Number} s is the number of milliseconds to sleep
+ */
+const sleep = async s => new Promise(r => setTimeout(() => { r(); }, s));
+
+/**
+* Checks if the given param exists in the given object
+* @param {object} obj is the object to check if the given param exists in
+* @param {string} param is the param to check if it exists in the given obj
+* @returns {Boolean}
+*/
+// eslint-disable-next-line max-len
+const itemExists = (obj, param) => typeof obj === 'object' && obj !== null ? Object.prototype.hasOwnProperty.call(
+  obj, param,
+) : false;
 
 /**
    * Gets records for given query object.
