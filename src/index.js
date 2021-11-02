@@ -1,6 +1,6 @@
 import { withEventStream } from './lib/helper';
 import es from './lib/eventStream';
-import dynamoUtils from './lib/dynamo';
+import dynamo from './lib/dynamo';
 import * as utils from './lib/util';
 
 /**
@@ -18,7 +18,7 @@ module.exports = {
    * @description Utility functions
    */
   utils,
-  dynamo: dynamoUtils,
+  dynamo,
   health: svcName => {
     return `${svcName} is healthy`;
   }

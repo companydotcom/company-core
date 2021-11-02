@@ -1,4 +1,6 @@
 import { SNS } from 'aws-sdk';
+import uuid from 'uuid/v4';
+
 import { parseJson } from './util';
 
 const sns = new SNS({ apiVersion: '2010-03-31' });
@@ -49,30 +51,76 @@ const parseSnsType = (val, type) => (isSnsString(type)
  * @property {MessageAttribute<'trigger' | 'pass' | 'fail'>} status
  */
 
+/**
+ * @description Publish message to SNS event stream.
+ * @param {string} topicArn
+ * @param {{ [key: string]: any }} message
+ * @param {CompanyEventAttributes} attributes
+*/
+const publish = async (topicArn, message, attributes = {}, options = {}) => {
+ let res;
+ try {
+   const params = {
+     Message: JSON.stringify(message),
+     TopicArn: topicArn,
+     MessageAttributes: parseAttributes(attributes),
+     ...options,
+   };
+   res = await sns.publish(params).promise();
+   console.log('SNS Publish - Success: ', JSON.stringify(params));
+   return res;
+ } catch (err) {
+   console.log('SNS Publish - Failure: ', err.toString());
+   return err;
+ }
+}
+
+/**
+ * @typedef SnsConfig
+ * @property {string} awsRegion
+ * @property {string} awsAccountId
+ * @property {string} tileId
+ * @property {string} productId
+ * @property {string} stateCurrent
+ * @property {string} eventType
+ * @property {string} service - service name
+ * @property {string?} eventId - can supply a specific eventId- or will be auto-genned otherwise
+ */
+
+/**
+ * @function publishTransition
+ * @description Simplified interface over "publish" specialized for transition events
+ * @param {SnsConfig} config
+ * @param {*} payload - object to be sent as SNS payload
+ * @param {*} context - object to be sent as SNS context, should include user.userId
+ */
+const publishTransition = async ({
+  awsAccountId,
+  awsRegion,
+  tileId,
+  productId,
+  stateCurrent,
+  eventType, service, eventId, },
+  payload,
+  context,
+) => {
+  return publish(`arn:aws:sns:${awsRegion}:${awsAccountId}:event-bus`, { payload, context, metadata: {
+    eventType,
+    stateCurrent,
+    tileId,
+  }}, {
+    emitter: service,
+    eventId: eventId || uuid(),
+    entity: 'product',
+    entityId: productId,
+    eventType: 'transition',
+    status: 'trigger',
+  });
+};
+
 export default {
-  /**
-   * @description Publish message to SNS event stream.
-   * @param {string} topicArn
-   * @param {{ [key: string]: any }} message
-   * @param {CompanyEventAttributes} attributes
-   */
-  publish: async (topicArn, message, attributes = {}, options = {}) => {
-    let res;
-    try {
-      const params = {
-        Message: JSON.stringify(message),
-        TopicArn: topicArn,
-        MessageAttributes: parseAttributes(attributes),
-        ...options,
-      };
-      res = await sns.publish(params).promise();
-      console.log('SNS Publish - Success: ', JSON.stringify(params));
-      return res;
-    } catch (err) {
-      console.log('SNS Publish - Failure: ', err.toString());
-      return err;
-    }
-  },
+  publish,
+  publishTransition,
   /**
    * @description Parses a CompanyEvent, returning an object that retains only the original event's "Message" and "MessageAttributes" values.
    * @template M
